@@ -29,7 +29,7 @@ class User(AbstractUser):
         blank=True
     )
     bio = models.TextField(
-        'Биография',
+        'Биография_123',
         blank=True,
     )
     role = models.CharField(
