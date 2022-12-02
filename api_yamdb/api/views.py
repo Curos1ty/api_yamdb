@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
 
 from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import LimitOffsetPagination
@@ -10,7 +11,8 @@ from .serializers import (
     CategorySerializer,
     GenreSerializer,
     TitleCreateUpdateSerializer,
-    TitleSerializer
+    TitleSerializer,
+    ReviewSerializer
 )
 
 
@@ -47,3 +49,16 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.request.method in ('POST', 'PATCH'):
             return TitleCreateUpdateSerializer
         return TitleSerializer
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+    # permission_classes = [IsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        post = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return post.comments
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)
