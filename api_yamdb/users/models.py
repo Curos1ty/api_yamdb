@@ -6,7 +6,8 @@ class User(AbstractUser):
     ROLES = (
         ('user', 'user'),
         ('moderator', 'moderator'),
-        ('admin', 'admin')
+        ('admin', 'admin'),
+        ('django admin', 'django admin')
     )
     username = models.TextField(
         'Имя пользователя',
@@ -29,18 +30,19 @@ class User(AbstractUser):
         blank=True
     )
     bio = models.TextField(
-        'Биография_123',
+        'Биография',
         blank=True,
     )
     role = models.CharField(
+        'Роли',
         max_length=30,
         choices=ROLES,
         default='user'
     )
-    is_user = models.BooleanField(default=False)
-    is_moderator = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField('Модератор', default=False)
+    is_superuser = models.BooleanField('Джанго администратор', default=False)
+    is_admin = models.BooleanField('Администратор', default=False)
+    is_active = models.BooleanField('Активная учетная запись', default=True)
     USERNAME_FIELD: str = 'username'
     REQUIRED_FIELDS: 'list[str]' = ['email']
 
