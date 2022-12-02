@@ -49,23 +49,23 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews'
     )
-    text = models.TextField(verbose_name='Отзыв')
+    text = models.TextField('Отзыв')
     # добавить после создания Модели Юзера и удалить временное поле
     # author = models.ForeignKey(
     #     User,
+    #     'Автор',
     #     on_delete=models.CASCADE,
-    #     verbose_name='Автор',
     #     related_name='reviews'
     # )
     author = models.IntegerField()
     score = models.IntegerField(
-        verbose_name='Оценка',
+        'Оценка',
         validators=[validate_score]
     )
     pub_date = models.DateTimeField(
+        'Дата публикации',
         auto_now_add=True,
         db_index=True,
-        verbose_name='Дата публикации'
     )
 
     class Meta:
@@ -82,21 +82,21 @@ class Comment(models.Model):
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
-        verbose_name='отзыв',
-        related_name='comments'
+        related_name='comments',
     )
-    text = models.TextField(verbose_name='Комментарий')
+    text = models.TextField('Комментарий')
     # добавить после создания Модели Юзера и удалить временное поле
     # author = models.ForeignKey(
     #     User,
+    #     'Автор',
     #     on_delete=models.CASCADE,
     #     related_name='comments'
     # )
     author = models.IntegerField()
     pub_date = models.DateTimeField(
+        'Дата публикации',
         auto_now_add=True,
         db_index=True,
-        verbose_name='Дата публикации'
     )
 
     class Meta:
