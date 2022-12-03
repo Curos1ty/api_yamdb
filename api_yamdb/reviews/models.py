@@ -1,13 +1,17 @@
 from django.db import models
 
-from .validators import validate_year, validate_score
+from .validators import validate_score, validate_year
 # from users.models import User
 
 
 class Category(models.Model):
     """Категории произведений."""
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField('Название категории', max_length=256)
+    slug = models.SlugField('Слаг категории', max_length=50, unique=True)
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
@@ -15,8 +19,12 @@ class Category(models.Model):
 
 class Genre(models.Model):
     """Жанры произведений."""
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField('Название жанра', max_length=256)
+    slug = models.SlugField('Слаг жанра', max_length=50, unique=True)
+
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
 
     def __str__(self):
         return self.name
@@ -24,19 +32,29 @@ class Genre(models.Model):
 
 class Title(models.Model):
     """Произведения."""
-    name = models.CharField(max_length=256)
-    year = models.PositiveSmallIntegerField(validators=[validate_year])
-    description = models.TextField(blank=True)
+    name = models.CharField('Название произведения', max_length=256)
+    year = models.PositiveSmallIntegerField(
+        'Год выпуска произведения',
+        validators=[validate_year]
+    )
+    description = models.TextField('Описание произведения', blank=True)
     category = models.ForeignKey(
         Category,
-        related_name='categories',
+        related_name='titles',
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        verbose_name='Категория'
     )
     genre = models.ManyToManyField(
         Genre,
-        related_name='genres'
+        related_name='titles',
+        through='GenreTitle',
+        verbose_name='Жанр'
     )
+
+    class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
 
     def __str__(self):
         return self.name
@@ -108,3 +126,12 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class GenreTitle(models.Model):
+    """Промежуточная модель для связи отношения ManyToMany."""
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.genre
