@@ -34,9 +34,10 @@ class TitleSerializer(serializers.ModelSerializer):
 
     def get_rating(self, obj):
         """Вывод рейтинга произведения."""
-        # rating = obj.reviews.aggregate(Avg('score'))
-        # return int(rating['score__avg'])
-        return 5
+        rating = obj.reviews.aggregate(Avg('score')).get('score__avg')
+        if not rating:
+            return None
+        return rating
 
 
 class TitleCreateUpdateSerializer(serializers.ModelSerializer):
@@ -49,7 +50,7 @@ class TitleCreateUpdateSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('name', 'year', 'description', 'genre', 'category')
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
         model = Title
 
     def validate_year(self, value):
