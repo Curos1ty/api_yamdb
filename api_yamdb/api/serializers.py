@@ -3,7 +3,7 @@ import datetime as dt
 from django.db.models import Avg
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title
+from reviews.models import Category, Genre, Title, Review, Comment
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -61,3 +61,27 @@ class TitleCreateUpdateSerializer(serializers.ModelSerializer):
                 'Год выпуска не может превышать текущий год!'
             )
         return value
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    # author = serializers.SlugRelatedField(
+    #          read_only=True, slug_field='username'
+    # )
+    author = serializers.IntegerField(default=1, read_only=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Review
+        read_only_fields = ('title', )
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    # author = serializers.SlugRelatedField(
+    #          read_only=True, slug_field='username'
+    # )
+    author = serializers.IntegerField(default=1, read_only=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Comment
+        read_only_fields = ('review', )

@@ -1,6 +1,6 @@
 from django.db import models
 
-from .validators import validate_score, validate_year
+from .validators import validate_year
 # from users.models import User
 
 
@@ -65,6 +65,8 @@ class Title(models.Model):
 
 class Review(models.Model):
     """Отзывы."""
+    SCORE_CHOICES = [(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),
+                     (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')]
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -75,15 +77,17 @@ class Review(models.Model):
     # добавить после создания Модели Юзера и удалить временное поле
     # author = models.ForeignKey(
     #     User,
-    #     'Автор',
+    #     verbose_name='Автор',
     #     on_delete=models.CASCADE,
     #     related_name='reviews'
+    #     unique=True
     # )
-    author = models.IntegerField()
-    score = models.IntegerField(
-        'Оценка',
-        validators=[validate_score]
-    )
+    author = models.IntegerField(blank=True)
+    # score = models.IntegerField(
+    #     'Оценка',
+    #     validators=[validate_score]
+    # )
+    score = models.PositiveSmallIntegerField('Оценка', choices=SCORE_CHOICES)
     pub_date = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True,
@@ -111,7 +115,7 @@ class Comment(models.Model):
     # добавить после создания Модели Юзера и удалить временное поле
     # author = models.ForeignKey(
     #     User,
-    #     'Автор',
+    #     verbose_name='Автор',
     #     on_delete=models.CASCADE,
     #     related_name='comments'
     # )
