@@ -34,7 +34,10 @@ class TitleSerializer(serializers.ModelSerializer):
 
     def get_rating(self, obj):
         """Вывод рейтинга произведения."""
-        return obj.reviews.aggregate(Avg('score')).get('score__avg')
+        rating = obj.reviews.aggregate(Avg('score')).get('score__avg')
+        if not rating:
+            return None
+        return rating
 
 
 class TitleCreateUpdateSerializer(serializers.ModelSerializer):
