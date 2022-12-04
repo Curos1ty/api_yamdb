@@ -11,10 +11,10 @@ def validate_year(value):
     return value
 
 
-def validate_score(value):
-    """Проверка соответствия рейтинга значению 1-10."""
-    if not 0 < isinstance(value, int) < 11:
-        raise ValueError(
-            'Значение рейтинга должно быть целым числом в диапазоне 1-10!'
-        )
-    return value
+# def validate_score(value):
+#     """Проверка соответствия рейтинга значению 1-10."""
+#     if not 0 < isinstance(value, int) < 11:
+#         raise ValueError(
+#             'Значение рейтинга должно быть целым числом в диапазоне 1-10!'
+#         )
+#     return value

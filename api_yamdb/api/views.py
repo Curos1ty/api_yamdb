@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import PageNumberPagination
 
-from reviews.models import Category, Genre, Title
+from reviews.models import Category, Genre, Title, Review
 
 from .filters import TitleFilter
 from .serializers import (
@@ -12,7 +12,8 @@ from .serializers import (
     GenreSerializer,
     TitleCreateUpdateSerializer,
     TitleSerializer,
-    ReviewSerializer
+    ReviewSerializer,
+    CommentSerializer
 )
 
 
@@ -56,12 +57,25 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    # permission_classes = [IsOwnerOrReadOnly]
+    pagination_class = None
 
     def get_queryset(self):
-        post = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        return post.comments
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return title.reviews
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        return review.comments
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        serializer.save(author=self.request.user, review=review)
