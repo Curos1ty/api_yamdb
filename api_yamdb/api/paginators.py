@@ -2,8 +2,12 @@ from rest_framework.pagination import PageNumberPagination
 
 
 class ReviewPagination(PageNumberPagination):
+    """Пагинатор для отзывов."""
+
     page_size = 1
 
 
 class CommentPagination(PageNumberPagination):
-    page_size = 1    
+    """Пагинатор для комментариев."""
+
+    page_size = 1

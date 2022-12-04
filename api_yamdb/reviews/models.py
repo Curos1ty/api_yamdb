@@ -1,11 +1,13 @@
 from django.db import models
 
+from users.models import User
+
 from .validators import validate_year
-# from users.models import User
 
 
 class Category(models.Model):
     """Категории произведений."""
+
     name = models.CharField('Название категории', max_length=256)
     slug = models.SlugField('Слаг категории', max_length=50, unique=True)
 
@@ -20,6 +22,7 @@ class Category(models.Model):
 
 class Genre(models.Model):
     """Жанры произведений."""
+
     name = models.CharField('Название жанра', max_length=256)
     slug = models.SlugField('Слаг жанра', max_length=50, unique=True)
 
@@ -34,6 +37,7 @@ class Genre(models.Model):
 
 class Title(models.Model):
     """Произведения."""
+
     name = models.CharField('Название произведения', max_length=256)
     year = models.PositiveSmallIntegerField(
         'Год выпуска произведения',
@@ -65,8 +69,11 @@ class Title(models.Model):
 
 class Review(models.Model):
     """Отзывы."""
-    SCORE_CHOICES = [(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),
-                     (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')]
+
+    SCORE_CHOICES = [
+        (1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),
+        (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')
+    ]
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -74,19 +81,13 @@ class Review(models.Model):
         verbose_name='Заголовок'
     )
     text = models.TextField('Отзыв')
-    # добавить после создания Модели Юзера и удалить временное поле
-    # author = models.ForeignKey(
-    #     User,
-    #     verbose_name='Автор',
-    #     on_delete=models.CASCADE,
-    #     related_name='reviews'
-    #     unique=True
-    # )
-    author = models.IntegerField(blank=True)
-    # score = models.IntegerField(
-    #     'Оценка',
-    #     validators=[validate_score]
-    # )
+    author = models.ForeignKey(
+        User,
+        verbose_name='Автор',
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        unique=True
+    )
     score = models.PositiveSmallIntegerField('Оценка', choices=SCORE_CHOICES)
     pub_date = models.DateTimeField(
         'Дата публикации',
@@ -105,6 +106,7 @@ class Review(models.Model):
 
 class Comment(models.Model):
     """Комментарии."""
+
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
@@ -112,14 +114,12 @@ class Comment(models.Model):
         verbose_name='Отзыв'
     )
     text = models.TextField('Комментарий')
-    # добавить после создания Модели Юзера и удалить временное поле
-    # author = models.ForeignKey(
-    #     User,
-    #     verbose_name='Автор',
-    #     on_delete=models.CASCADE,
-    #     related_name='comments'
-    # )
-    author = models.IntegerField()
+    author = models.ForeignKey(
+        User,
+        verbose_name='Автор',
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
     pub_date = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True,
@@ -137,6 +137,7 @@ class Comment(models.Model):
 
 class GenreTitle(models.Model):
     """Промежуточная модель для связи отношения ManyToMany."""
+
     title = models.ForeignKey(Title, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
 

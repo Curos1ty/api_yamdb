@@ -3,11 +3,12 @@ import datetime as dt
 from django.db.models import Avg
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title, Review, Comment
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор категорий произведений."""
+
     class Meta:
         fields = ('name', 'slug')
         model = Category
@@ -15,6 +16,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор жанров произведений."""
+
     class Meta:
         fields = ('name', 'slug')
         model = Genre
@@ -22,6 +24,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор списка произведений."""
+
     category = CategorySerializer(read_only=True)
     genre = GenreSerializer(read_only=True, many=True)
     rating = serializers.SerializerMethodField()
@@ -34,14 +37,12 @@ class TitleSerializer(serializers.ModelSerializer):
 
     def get_rating(self, obj):
         """Вывод рейтинга произведения."""
-        rating = obj.reviews.aggregate(Avg('score')).get('score__avg')
-        if not rating:
-            return None
-        return rating
+        return obj.reviews.aggregate(Avg('score')).get('score__avg')
 
 
 class TitleCreateUpdateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания и изменения произведений."""
+
     category = serializers.SlugRelatedField(
         slug_field='slug', queryset=Category.objects.all(), many=False
     )
@@ -64,10 +65,11 @@ class TitleCreateUpdateSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    # author = serializers.SlugRelatedField(
-    #          read_only=True, slug_field='username'
-    # )
-    author = serializers.IntegerField(default=1, read_only=True)
+    """Сериализатор отзывов."""
+
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
 
     class Meta:
         fields = '__all__'
@@ -76,10 +78,11 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    # author = serializers.SlugRelatedField(
-    #          read_only=True, slug_field='username'
-    # )
-    author = serializers.IntegerField(default=1, read_only=True)
+    """Сериализатор комментариев к отзывам."""
+
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
 
     class Meta:
         fields = '__all__'
