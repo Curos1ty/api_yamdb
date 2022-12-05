@@ -15,6 +15,7 @@ from .serializers import (
     TitleCreateUpdateSerializer,
     TitleSerializer,
 )
+from users.permissions import IsAdminOnly, IsAdminOrReadOnly, IsAuthorOrAdminOrReadOnly
 
 
 class CreateListDestroyViewSet(
@@ -26,7 +27,7 @@ class CreateListDestroyViewSet(
     """Общие настройки для классов c методами post, get, delete."""
 
     pagination_class = PageNumberPagination
-#    permission_classes =
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -51,7 +52,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     queryset = Title.objects.all()
     pagination_class = PageNumberPagination
-#    permission_classes =
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
 
@@ -75,7 +76,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     serializer_class = ReviewSerializer
     pagination_class = ReviewPagination
-#    permission_classes =
+    permission_classes = (IsAuthorOrAdminOrReadOnly,)
 
     def get_queryset(self):
         return get_title_or_review(self).reviews.all()
@@ -91,7 +92,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     serializer_class = CommentSerializer
     pagination_class = CommentPagination
-#    permission_classes =
+    permission_classes = (IsAuthorOrAdminOrReadOnly,)
 
     def get_queryset(self):
         return get_title_or_review(self).comments.all()
