@@ -53,12 +53,12 @@ python manage.py import_comments_csv
 
 ##### Добавление новой публикации в коллекцию публикаций. Анонимные запросы запрещены.
 
-Запрос POST http://127.0.0.1:8000/api/v1/posts/
+Запрос POST http://127.0.0.1:8000/api/v1/posts/ (только Администратор)
 Request samples:
 ```json
 {
-    "text": "string",
-    "image": "string",
+    "name": "string",
+    "slug": "string",
     "group": 0
 }
 ```
