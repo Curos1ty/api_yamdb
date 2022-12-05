@@ -5,6 +5,8 @@ from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор для пользователя."""
+
     username = serializers.CharField(
         validators=[UniqueValidator(queryset=User.objects.all()), ],
     )
@@ -25,6 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
+    """Сериализатор для me пользователя."""
 
     class Meta:
         model = User
@@ -40,6 +43,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserTokenSerializer(serializers.ModelSerializer):
+    """Сериализатор для токена."""
 
     class Meta:
         model = User

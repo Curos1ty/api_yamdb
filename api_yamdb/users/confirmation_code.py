@@ -3,6 +3,8 @@ from django.utils import six
 
 
 class ConfirmationCodeGenerator(PasswordResetTokenGenerator):
+    """Генерация кода подтверждения."""
+
     def _make_hash_value(self, user, timestamp: int) -> str:
         login_timestamp = (
             '' if user.last_login is None

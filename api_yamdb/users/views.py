@@ -23,6 +23,7 @@ confirmation_code_generator = ConfirmationCodeGenerator()
 
 @api_view(http_method_names=['POST'])
 def send_mail(request):
+    """Отправка кода подтверждения."""
     serializer = UserSerializer(data=request.data)
 
     if serializer.is_valid():
@@ -58,6 +59,8 @@ def send_mail(request):
 
 
 class UserViewSet(ModelViewSet):
+    """Вьюсет для пользователя."""
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdminOnly,)
