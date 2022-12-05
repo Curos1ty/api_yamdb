@@ -1,6 +1,7 @@
 import datetime as dt
 
 from django.db.models import Avg
+
 from rest_framework import serializers
 
 from reviews.models import Category, Comment, Genre, Review, Title
@@ -75,6 +76,18 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = Review
         read_only_fields = ('title', )
+        unique_together = ('author', 'title')
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        title_id = self.context.get('view').kwargs.get('title_id')
+        if request.method == 'POST' and Review.objects.filter(
+            author=request.user, title=title_id
+        ).exists():
+            raise serializers.ValidationError(
+                'Вы уже оставляли отзыв на это произведение!'
+            )
+        return attrs
 
 
 class CommentSerializer(serializers.ModelSerializer):

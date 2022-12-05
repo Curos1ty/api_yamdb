@@ -1,16 +1,22 @@
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import api_view, action
-from rest_framework import status, filters
-from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
 from django.core import mail
-from rest_framework.pagination import PageNumberPagination
-from rest_framework_simplejwt.tokens import AccessToken 
+from django.shortcuts import get_object_or_404
 
-from .models import User
-from .serializers import UserSerializer, UserUpdateSerializer, UserTokenSerializer
+from rest_framework import filters, status
+from rest_framework.decorators import action, api_view
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+
+from rest_framework_simplejwt.tokens import AccessToken
+
 from .confirmation_code import ConfirmationCodeGenerator
+from .models import User
 from .permissions import IsAdminOnly, IsUser
+from .serializers import (
+    UserSerializer,
+    UserTokenSerializer,
+    UserUpdateSerializer
+)
 
 confirmation_code_generator = ConfirmationCodeGenerator()
 
@@ -37,8 +43,8 @@ def send_mail(request):
         confirmation_code = confirmation_code_generator.make_token(user)
         mail_subject = 'Активация Вашего аккаунта.'
         message = (
-            f"Приветствуем! Вот Ваш код: "
-            f"{confirmation_code}"
+            f'Приветствуем! Вот Ваш код: '
+            f'{confirmation_code}'
         )
         to_email = str(request.data.get('email'))
         # email = mail.EmailMessage(mail_subject, message, to=[to_email])
@@ -105,7 +111,7 @@ def create_token(request):
 
     if confirmation_code == user.confirmation_code:
         token = AccessToken.for_user(user)
-        return Response({'access': str(token),})
+        return Response({'access': str(token), })
 
     return Response(
         'Неверный код подтверждения', status=status.HTTP_400_BAD_REQUEST

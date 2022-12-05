@@ -1,14 +1,15 @@
 # api_yamdb
 api_yamdb
 ### Описание
-API Yatube имеет следующие возможности: 
+API YAMDB имеет следующие ресурсы: 
 Описание (адрес по умолчанию http://127.0.0.1:8000/api/v1/) | Какие методы запросов настроены
 ---------|--------
-Публикации: posts/, posts/{id}/ | GET(list), POST, GET(retrieve), PUT, PATCH, DELETE
-Комментарии: posts/{post_id}/comments/, posts/{post_id}/comments/{id}/ | GET(list), POST, GET(retrieve), PUT, PATCH, DELETE
-Сообщества: groups/, groups/{id}/ | GET(list), GET(retrieve)
-Подписки: follow/| GET(list), POST
-JWT-токен: jwt/create/, jwt/refresh/, jwt/verify/| POST
+Категории: categories/, categories/{slug}/ | GET(list), POST, DELETE
+Жанры: genres/, genres/{slug}/ | GET(list), POST, DELETE
+Произведения: titles/, titles/{titles_id}/ | GET(list), POST, GET(retrieve), PATCH, DELETE
+Отзывы: titles/{title_id}/reviews/, titles/{title_id}/reviews/{review_id}/ | GET(list), POST, GET(retrieve), PATCH, DELETE
+Комментарии: titles/{title_id}/reviews/{review_id}/comments/, {title_id}/reviews/{review_id}/comments/{comment_id}/ | GET(list), POST, GET(retrieve), PATCH, DELETE
+Пользователи: users/, users/{username}/, | GET(list), POST, GET(retrieve) user, PATCH, DELETE, GET (me), PATCH(me)
 ### Технологии
 * Python 3.7.9 64-bit
 * Django 2.2.16
@@ -51,55 +52,56 @@ python manage.py import_comments_csv
 
 ### Примеры запросов
 
-##### Добавление новой публикации в коллекцию публикаций. Анонимные запросы запрещены.
+##### Добавление новой категории. Права доступа: Администратор
 
-Запрос POST http://127.0.0.1:8000/api/v1/posts/ (только Администратор)
+Запрос POST http://127.0.0.1:8000/api/v1/categories/
 Request samples:
 ```json
 {
     "name": "string",
     "slug": "string",
-    "group": 0
 }
 ```
 
-* text (required) string (текст публикации)
-* image string or null \<binary>
-* group integer or null (id сообщества)
+* name (required) string (наименование категории)
+* slug (required) string (название для ссылки)
+
+Вывод (Response samples):
+``` json
+{
+    "name": "string",
+    "slug": "string"
+}
+```
+
+##### Добавление нового отзыва.
+
+Запрос POST http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/
+Request samples:
+```json
+{
+    "text": "string"
+    "score": 1
+}
+```
+
+* text (required) string
+* score (required) integer
 
 Вывод (Response samples):
 ``` json
 {
     "id": 0,
-    "author": "test",
-    "text": "test",
-    "pub_date": "2019-08-24T14:15:22Z",
-    "image": "string",
-    "group": 2
-}
-```
-
-##### Подписка пользователя от имени которого сделан запрос на пользователя переданного в теле запроса. Анонимные запросы запрещены.
-
-Запрос POST http://127.0.0.1:8000/api/v1/follow/
-Request samples:
-```json
-{
-    "following": "string"
-}
-```
-
-* following (required) string (username)
-
-Вывод (Response samples):
-``` json
-{
-    "user": "string",
-    "following": "string"
+    "text": "string",
+    "author": "string",
+    "score": 1,
+    "pub_date": "2019-08-24T14:15:22Z"
 }
 ```
 Подробнее о запросах и примерах можно узнать по адресу http://127.0.0.1:8000/redoc/
 ### Вы восхитительны!
 
 ### Авторы
-Ирина, Юсуп, Михаил
+Ирина Елисеева - модели, view, эндпоинты для произведений, категорий, жанров, реализация импорта данных из csv файлов.
+Юсуп Шарафутдинов - работает над: отзывами, комментариями, рейтингом произведений.
+Михаил Передереев - вся часть, касющаяся управлением пользователей: система регистрации и аутентификации, права доступа, работа с токеном, система подтверждения через e-mail 

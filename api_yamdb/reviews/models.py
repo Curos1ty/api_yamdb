@@ -86,7 +86,6 @@ class Review(models.Model):
         verbose_name='Автор',
         on_delete=models.CASCADE,
         related_name='reviews',
-        unique=True
     )
     score = models.PositiveSmallIntegerField('Оценка', choices=SCORE_CHOICES)
     pub_date = models.DateTimeField(
@@ -99,6 +98,12 @@ class Review(models.Model):
         verbose_name_plural = 'Отзывы'
         verbose_name = 'Отзыв'
         ordering = ['-pub_date']
+        constraints = [
+            models.UniqueConstraint(
+                fields=('title', 'author'),
+                name='unique_review'
+            )
+        ]
 
     def __str__(self):
         return self.text

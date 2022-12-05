@@ -1,9 +1,16 @@
 from django.shortcuts import get_object_or_404
+
 from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import PageNumberPagination
 
 from reviews.models import Category, Genre, Review, Title
+
+from users.permissions import (
+    IsAdminOrReadOnly,
+    IsAuthorOrAdminOrReadOnly
+)
 
 from .filters import TitleFilter
 from .paginators import CommentPagination, ReviewPagination
@@ -15,7 +22,6 @@ from .serializers import (
     TitleCreateUpdateSerializer,
     TitleSerializer,
 )
-from users.permissions import IsAdminOnly, IsAdminOrReadOnly, IsAuthorOrAdminOrReadOnly
 
 
 class CreateListDestroyViewSet(
