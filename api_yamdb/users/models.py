@@ -3,15 +3,17 @@ from django.db import models
 
 
 class User(AbstractUser):
+    ADMIN_ROLE = 'admin'
+    USER_ROLE = 'user'
+    MODERATOR_ROLE = 'moderator'
     ROLES = (
-        ('user', 'user'),
-        ('moderator', 'moderator'),
-        ('admin', 'admin'),
-        ('django admin', 'django admin')
+        (USER_ROLE, 'user'),
+        (MODERATOR_ROLE, 'moderator'),
+        (ADMIN_ROLE, 'admin'),
     )
     username = models.TextField(
         'Имя пользователя',
-        max_length=20,
+        max_length=150,
         unique=True
     )
     email = models.EmailField(
@@ -21,12 +23,12 @@ class User(AbstractUser):
     )
     first_name = models.TextField(
         'Имя',
-        max_length=30,
+        max_length=150,
         blank=True,
     )
     last_name = models.TextField(
         'Фамилия',
-        max_length=30,
+        max_length=150,
         blank=True
     )
     bio = models.TextField(
@@ -35,16 +37,30 @@ class User(AbstractUser):
     )
     role = models.CharField(
         'Роли',
-        max_length=30,
+        max_length=150,
         choices=ROLES,
         default='user'
     )
-    is_staff = models.BooleanField('Модератор', default=False)
-    is_superuser = models.BooleanField('Джанго администратор', default=False)
-    is_admin = models.BooleanField('Администратор', default=False)
-    is_active = models.BooleanField('Активная учетная запись', default=True)
+    confirmation_code = models.CharField(
+        'Код подтверждения',
+        max_length=10,
+        blank=True
+    )
     USERNAME_FIELD: str = 'username'
     REQUIRED_FIELDS: 'list[str]' = ['email']
 
     class Meta:
         unique_together = ('username', 'email',)
+        ordering = ['username']
+
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN_ROLE
+
+    @property
+    def is_user(self):
+        return self.role == self.USER_ROLE
+
+    @property
+    def is_moderator(self):
+        return self.role == self.MODERATOR_ROLE
