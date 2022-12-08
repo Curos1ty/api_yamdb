@@ -50,7 +50,12 @@ class User(AbstractUser):
     REQUIRED_FIELDS: 'list[str]' = ['email']
 
     class Meta:
-        unique_together = ('username', 'email',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=('username', 'email'),
+                name='unique_user'
+            )
+        ]
         ordering = ['username']
 
     @property

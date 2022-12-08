@@ -1,3 +1,4 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from users.models import User
@@ -54,7 +55,6 @@ class Title(models.Model):
     genre = models.ManyToManyField(
         Genre,
         related_name='titles',
-        through='GenreTitle',
         verbose_name='Жанр'
     )
 
@@ -70,10 +70,6 @@ class Title(models.Model):
 class Review(models.Model):
     """Отзывы."""
 
-    SCORE_CHOICES = [
-        (1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),
-        (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')
-    ]
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -87,7 +83,10 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews',
     )
-    score = models.PositiveSmallIntegerField('Оценка', choices=SCORE_CHOICES)
+    score = models.PositiveSmallIntegerField(
+        'Оценка',
+        validators=[MinValueValidator(1), MaxValueValidator(10)]
+    )
     pub_date = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True,
@@ -138,13 +137,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text
-
-
-class GenreTitle(models.Model):
-    """Промежуточная модель для связи отношения ManyToMany."""
-
-    title = models.ForeignKey(Title, on_delete=models.CASCADE)
-    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.genre

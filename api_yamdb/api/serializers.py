@@ -1,17 +1,18 @@
-import datetime as dt
-
-from django.db.models import Avg
+from django.utils import timezone
 
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title
+
+from users.models import User
 
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор категорий произведений."""
 
     class Meta:
-        fields = ('name', 'slug')
+        exclude = ('id',)
         model = Category
 
 
@@ -19,7 +20,7 @@ class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор жанров произведений."""
 
     class Meta:
-        fields = ('name', 'slug')
+        exclude = ('id',)
         model = Genre
 
 
@@ -28,17 +29,19 @@ class TitleSerializer(serializers.ModelSerializer):
 
     category = CategorySerializer(read_only=True)
     genre = GenreSerializer(read_only=True, many=True)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         fields = (
-            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category'
         )
         model = Title
-
-    def get_rating(self, obj):
-        """Вывод рейтинга произведения."""
-        return obj.reviews.aggregate(Avg('score')).get('score__avg')
 
 
 class TitleCreateUpdateSerializer(serializers.ModelSerializer):
@@ -57,7 +60,7 @@ class TitleCreateUpdateSerializer(serializers.ModelSerializer):
 
     def validate_year(self, value):
         """Проверка года выпуска произведения."""
-        current_year = dt.date.today().year
+        current_year = timezone.now().year
         if value > current_year:
             raise serializers.ValidationError(
                 'Год выпуска не может превышать текущий год!'
@@ -101,3 +104,60 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = Comment
         read_only_fields = ('review', )
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор для пользователя."""
+
+    username = serializers.CharField(
+        validators=[UniqueValidator(queryset=User.objects.all()), ],
+    )
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=User.objects.all()), ],
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role',
+        ]
+
+    def validate_username(self, value):
+        if value.lower() == 'me':
+            raise serializers.ValidationError(
+                'Выберите другое имя пользователя!'
+            )
+
+        return value
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    """Сериализатор для me пользователя."""
+
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role',
+        ]
+        read_only_fields = ('role', )
+
+
+class UserTokenSerializer(serializers.ModelSerializer):
+    """Сериализатор для токена."""
+
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            'confirmation_code'
+        ]
