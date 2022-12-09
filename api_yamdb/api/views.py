@@ -1,27 +1,13 @@
 from django.core import mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-
 from django_filters.rest_framework import DjangoFilterBackend
-
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-
 from rest_framework_simplejwt.tokens import AccessToken
-
-from reviews.models import Category, Genre, Title
-
-from users.confirmation_code import ConfirmationCodeGenerator
-from users.models import User
-from users.permissions import (
-    IsAdminOnly,
-    IsAdminOrReadOnly,
-    IsAuthorOrAdminOrReadOnly,
-    IsUser
-)
 
 from .filters import TitleFilter
 from .mixins import CreateListDestroyViewSet
@@ -38,6 +24,15 @@ from .serializers import (
     UserUpdateSerializer
 )
 from .utils import get_title_or_review
+from reviews.models import Category, Genre, Title
+from users.confirmation_code import ConfirmationCodeGenerator
+from users.models import User
+from users.permissions import (
+    IsAdminOnly,
+    IsAdminOrReadOnly,
+    IsAuthorOrAdminOrReadOnly,
+    IsUser
+)
 
 confirmation_code_generator = ConfirmationCodeGenerator()
 
@@ -112,7 +107,7 @@ def send_mail(request):
     serializer.is_valid(raise_exception=True)
     user = User.objects.create(
         email=serializer.validated_data.get('email'),
-        username=request.data.get('username'),
+        username=serializer.validated_data.get('username'),
     )
     user.is_staff = False
     user.set_unusable_password()
@@ -123,7 +118,7 @@ def send_mail(request):
         f'Приветствуем! Вот Ваш код: '
         f'{confirmation_code}'
     )
-    to_email = str(request.data.get('email'))
+    to_email = str(serializer.validated_data.get('email'))
 
     with mail.get_connection() as connection:
         mail.EmailMessage(
@@ -172,8 +167,8 @@ class UserViewSet(ModelViewSet):
 
             serializer.is_valid(raise_exception=True)
             serializer.save()
-
             return Response(serializer.data)
+
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
